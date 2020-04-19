@@ -51,7 +51,7 @@ export default class App extends Component {
     this.updateHeaderTitle = (value) => {
       document.querySelector('.page-header__title').innerHTML = value;
     };
-    this.onButtonRotateHandler = (target, path) => {
+    this.onButtonRotateHandler = (path) => {
       path[1].classList.add('translate');
       path[1].addEventListener('mouseleave', () => {
         path[1].classList.remove('translate');
@@ -161,7 +161,7 @@ export default class App extends Component {
       const currentWord = target.querySelector('.card__header').innerHTML;
 
       const words = [];
-      wordArr.forEach((el, index) => { 
+      wordArr.forEach((el, index) => {
         if (index % 2 === 0) words.push(el.innerHTML);
       });
 
@@ -173,7 +173,7 @@ export default class App extends Component {
       const currentSound = new Audio(`./assets/${wordSound}`);
       currentSound.play();
     }
-    
+
     if (this.state.gameActive) {
       const currentCardWord = target.querySelector('.card__header').innerHTML;
       const answerWord = this.state.randomArr[this.state.currentCard].word;
@@ -256,6 +256,7 @@ export default class App extends Component {
 
   onClickHandler({ target, path }) {
     const activeLink = document.querySelector('.navigation__item-link--active');
+    const headerNav = document.querySelector('.page-header__navigation');
 
     if (target.id === CONSTANTS.startPageName) {
       if (this.state.page === CONSTANTS.startPageName) {
@@ -265,9 +266,6 @@ export default class App extends Component {
       this.getStartPage();
       this.state.page = CONSTANTS.startPageName;
       this.updateHeaderTitle(CONSTANTS.startPageName);
-
-      target.classList.add('navigation__item-link--active');
-      activeLink.classList.remove('navigation__item-link--active');
     }
 
     if (target.id !== CONSTANTS.startPageName && target.classList.contains('navigation__item-link')) {
@@ -283,7 +281,7 @@ export default class App extends Component {
     }
 
     if (target.classList.contains('card__rotate')) {
-      this.onButtonRotateHandler(target, path);
+      this.onButtonRotateHandler(path);
     }
 
     if (target.className === 'button content__button') {
@@ -293,6 +291,12 @@ export default class App extends Component {
 
     if (target.className === 'button content__button content__button--repeat') {
       this.state.currentSound.play();
+    }
+
+    if (!target.classList.contains('page-header__navigation')
+    && !target.classList.contains('page-header__button')) {
+      if (!headerNav.classList.contains('page-header__navigation--open')) return;
+      this.header.closeNavigation();
     }
   }
 
@@ -305,6 +309,9 @@ export default class App extends Component {
   }
 
   getStartPage() {
+    const activeLink = document.querySelector('.navigation__item-link--active');
+    const collectionsLink = document.getElementById('Collections');
+
     this.state.gameActive = false;
 
     document.querySelector('main').remove();
@@ -312,6 +319,9 @@ export default class App extends Component {
     this.updateHeaderTitle(CONSTANTS.startPageName);
 
     document.querySelector('.app-wrapper').append(collections);
+
+    collectionsLink.classList.add('navigation__item-link--active');
+    activeLink.classList.remove('navigation__item-link--active');
   }
 
   start() {

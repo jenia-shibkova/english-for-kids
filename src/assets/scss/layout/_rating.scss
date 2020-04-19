@@ -23,3 +23,9 @@
 .rating__star--error {
   background-image: url("../img/star-error.svg");
 }
+
+@media (max-width: 375px) {
+  .rating { 
+    max-width: 284px;
+  }
+}

@@ -88,8 +88,13 @@
   right: 20px;
   width: 30px;
   height: 30px;
-  background-image: url("../img/repeat.svg"); 
+  background-image: url("../img/repeat-blue.svg"); 
   pointer-events: auto;  
+  transition: background-image 0.5s;
+}
+
+.card__rotate:hover {
+  background-image: url("../img/repeat.svg");
 }
 
 @media (max-width: 740px) {

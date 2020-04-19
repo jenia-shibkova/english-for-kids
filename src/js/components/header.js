@@ -51,24 +51,18 @@ export default class Header extends Component {
         </ul>
       </nav>    
     </header>`;
-    this.onNavButtonClick = () => {
+    this.closeNavigation = () => {
       const navButton = document.querySelector('.page-header__button');
       const navigation = document.querySelector('.page-header__navigation');
 
-      if (navButton.classList.contains('page-header__button--menu-open')) {
-        navButton.classList.remove('page-header__button--menu-open');
-        navigation.classList.remove('page-header__navigation--open');
-      } else {
-        navButton.classList.add('page-header__button--menu-open');
-        navigation.classList.add('page-header__navigation--open');
-      }
+      navButton.classList.toggle('page-header__button--menu-open');
+      navigation.classList.toggle('page-header__navigation--open');
     };
   }
-
 
   start() {
     const navButton = document.querySelector('.page-header__button');
 
-    navButton.addEventListener('click', this.onNavButtonClick.bind(this));
+    navButton.addEventListener('click', this.closeNavigation);
   }
 }

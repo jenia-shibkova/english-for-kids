@@ -2,17 +2,18 @@
 
 const shuffle = (array) => {
   let counter = array.length;
+  const shuffleArr = array.slice();
 
   while (counter > 0) {
     let index = Math.floor(Math.random() * counter);
     counter -= 1;
 
-    let temp = array[counter];
-    array[counter] = array[index];
-    array[index] = temp;
+    let temp = shuffleArr[counter];
+    shuffleArr[counter] = shuffleArr[index];
+    shuffleArr[index] = temp;
   }
 
-  return array;
+  return shuffleArr;
 };
 
 const UTILS = {

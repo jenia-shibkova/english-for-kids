@@ -49,7 +49,6 @@ module.exports = {
       { from: './src/assets/audio', to: 'assets/audio' },
     ]),
   ],
-  devtool: 'source-map',
   devServer: {
     contentBase: path.join(__dirname, 'build'),
     publicPath: 'http://localhost:8080/',

@@ -1,0 +1,123 @@
+.switch {
+	position: relative;
+	display: inline-block;
+	width: 90px;
+	width: 110px;
+	height: 34px;
+}
+  
+.switch input {
+  display:none;
+}
+  
+.slider {
+	position: absolute;
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: $button-color-train;
+	-webkit-transition: .4s;
+	transition: .4s;
+}
+  
+.slider:before {
+	position: absolute;
+	content: "";
+	height: 26px;
+	width: 26px;
+	left: 4px;
+	bottom: 4px;
+	background-color: white;
+	-webkit-transition: .4s;
+	transition: .4s;
+}
+  
+input:checked + .slider {
+	background-color: $button-color-play;
+}
+  
+input:focus + .slider {
+	box-shadow: 0 0 1px #2196F3;
+}
+  
+input:checked + .slider:before {
+	-webkit-transform: translateX(77px);
+	-ms-transform: translateX(77px);
+	transform: translateX(77px);
+}
+  
+.play, .train {
+	color: white;
+	position: absolute;
+	transform: translate(-50%,-50%);
+	top: 50%;
+	left: 50%;
+	font-size: 11px;
+	font-weight: 500;
+}
+
+.play {
+	display: none;
+}
+
+.play::before {
+	content: "";
+	position: absolute;
+	width: 18px;
+	height: 18px;
+	left: -26px;
+	top: -10px;
+	background-image: url("../img/radio.svg");
+}
+
+.train::after {
+	content: "";
+	position: absolute;
+	width: 20px;
+	height: 20px;
+	right: -26px;
+	top: -10px;
+	background-image: url("../img/school.svg");
+}
+  
+input:checked + .slider .play {
+  display: block;
+}
+  
+input:checked + .slider .train {
+  display: none;
+}
+
+.slider.round {
+	border-radius: 34px;
+}
+  
+.slider.round:before {
+	border-radius: 50%;
+}
+  
+@media (max-width: 740px) {
+	.switch {
+		width: 80px;   
+	}
+	
+	.play, .train {
+	  font-size: 0;
+	}
+	
+	input:checked + .slider:before {
+		-webkit-transform: translateX(45px);
+		-ms-transform: translateX(45px);
+		transform: translateX(45px);
+	}
+	
+	.train::after {
+		right: -22px;
+	}
+	
+	.play::before {
+		left: -22px;
+	}
+}

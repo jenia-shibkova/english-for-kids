@@ -1,0 +1,104 @@
+.navigation {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;  
+  flex-direction: column;  
+  list-style: none;
+  z-index: 5;
+  position: relative;
+}
+
+.navigation__item-link {
+  padding: 10px;
+  margin: 0 0 0 20px;
+  color: $default-color;
+  min-width: 145px;
+  text-align: left;
+  display: inline-block;
+  text-decoration: none;
+  font-size: 22px;
+  cursor: pointer;
+  position: relative;
+  padding-left: 30px; 
+  transition: color 0.5s;
+}
+
+.navigation__item-link:hover {
+  color: $mainFontColor;
+  text-decoration: underline; 
+}
+
+.navigation__item-link:hover::before {
+  width: 20px;
+  height: 20px;
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+}
+
+.navigation__item-link--actionsSetA:hover::before {
+  background-image: url("../img/arrows/arrow-pink.svg");
+}
+
+.navigation__item-link--actionsSetB:hover::before {
+  background-image: url("../img/arrows/arrow-white.svg");
+}
+
+.navigation__item-link--actionsSetC:hover::before {
+  background-image: url("../img/arrows/arrow-orange.svg");
+}
+
+.navigation__item-link--adjectives:hover::before {
+  background-image: url("../img/arrows/arrow-purple.svg");
+}
+
+.navigation__item-link--animalSetA:hover::before {
+  background-image: url("../img/arrows/arrow-yellow.svg");
+}
+
+.navigation__item-link--animalSetB:hover::before {
+  background-image: url("../img/arrows/arrow-green-2.svg");
+}
+
+.navigation__item-link--clothes:hover::before {
+  background-image: url("../img/arrows/arrow-red.svg");
+}
+
+.navigation__item-link--emotions:hover::before {
+  background-image: url("../img/arrows/arrow-dark-blue.svg");
+}
+
+.navigation__item-link--active {
+  position: relative;
+}
+
+.navigation__item-link--active:hover {   
+  color: white;
+  text-decoration: none;
+}
+
+.navigation__item-link--active::before {
+  width: 10px;
+  height: 10px;
+  content: "";
+  position: absolute;
+  left: 9px;
+  top: 17px;
+  border-radius: 50%;
+  background: white;  
+}
+
+.navigation__item-link--active:hover::before {
+  width: 10px;
+  height: 10px;
+  left: 9px;
+  top: 17px; 
+  background: white; 
+}
+
+@media (max-width: 740px) {  
+  .navigation {
+    padding: 0;
+  }
+}

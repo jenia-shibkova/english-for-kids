@@ -1,0 +1,56 @@
+@import
+  "utils/vars";
+
+@import "vendors/normalize";
+
+@import 
+  "components/switcher",
+  "components/button",
+  "components/popup";
+
+@import 
+  "layout/page-header",
+  "layout/navigation",
+  "layout/collections",
+  "layout/card",
+  "layout/rating",
+  "layout/content";
+
+*, ::after, ::before {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Roboto", "Arial", sans-serif;
+  font-weight: 400;
+  background: $background-color; 
+}
+
+.app-wrapper {
+  padding-bottom: 40px;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.hidden {
+  display: none ;
+}
+
+.blocked {
+  opacity: .5;
+}
+
+@media (max-width: 1080px) {
+  .container {
+    max-width: 680px;
+  }  
+}
+
+@media (max-width: 730px) {
+  .container {
+    max-width: 300px;
+  }   
+}

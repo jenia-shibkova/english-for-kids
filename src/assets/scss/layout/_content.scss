@@ -1,0 +1,58 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.content__button {
+  width: 400px;
+  height: 60px;
+  background-color: $color-blue;
+  color: white;
+  margin: 0 auto;
+  border-radius: 0.25em;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 60px;
+  text-transform: uppercase;
+  transition: background-color 0.5s;
+}
+
+.content__button:hover,
+.content__button:active {
+  background-color: $button-color-play;
+}
+
+.content__button--repeat {
+  background: $button-color-play;
+  background-image: url("../img/replay.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  font-size: 0;
+  line-height: 0;
+}
+
+@media (max-width: 1080px) {
+  .content__button { 
+    width: calc(100% - 45px);
+  }
+
+  .content__button--repeat {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+@media (max-width: 730px) {
+  .content__button { 
+    width: calc(100% - 30px);
+  }  
+
+  .content__button--repeat {
+    width: 60px;
+    height: 60px;
+  }
+}

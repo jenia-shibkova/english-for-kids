@@ -1,0 +1,25 @@
+.rating {
+  margin-top: 30px;
+  max-height: 26px;
+  max-width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  overflow: hidden;
+}
+
+.rating__star {
+  width: 26px;
+  height: 26px;
+  margin-left: 10px;
+  flex-shrink: 0;
+  background-size: 26px 26px;
+}
+
+.rating__star--success {
+  background-image: url("../img/star.svg");
+}
+
+.rating__star--error {
+  background-image: url("../img/star-error.svg");
+}

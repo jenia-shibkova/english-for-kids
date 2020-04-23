@@ -47,7 +47,10 @@ export default class Header extends Component {
           </li>
           <li class="navigation__item">
             <a href="#" class="navigation__item-link navigation__item-link--emotions">Emotions</a>
-          </li>             
+          </li>
+          <li class="navigation__item">
+            <a id="Statistics" href="#" class="navigation__item-link">Statistics</a>
+          </li>              
         </ul>
       </nav>    
     </header>`;

@@ -14,7 +14,7 @@ export default class CardWrapper extends Component {
         </ul>
         <button class="button content__button hidden">Start game</button>
       </main>`;
-    this.generateCollectionItems = ()=> {
+    this.generateCollectionItems = () => {
       const container = document.createDocumentFragment();
 
       CONSTANTS.collections.forEach((el, item) => {
@@ -26,10 +26,10 @@ export default class CardWrapper extends Component {
       return container;
     };
 
-    this.generateCards = (index) => {
+    this.generateCards = (data) => {
       const container = document.createDocumentFragment();
 
-      DATA[index].forEach((item) => {
+      data.forEach((item) => {
         const card = new Card(item);
         const cardElement = card.createElement();
         container.appendChild(cardElement);
@@ -49,7 +49,8 @@ export default class CardWrapper extends Component {
   }
 
   changeCollection(index) {
-    const container = this.generateCards(index);
+    const data = DATA[index];
+    const container = this.generateCards(data);
     const itemWrapper = this.createElement();
     const collections = itemWrapper.querySelector('.collections');
     collections.append(container);

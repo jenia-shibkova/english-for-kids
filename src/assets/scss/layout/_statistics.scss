@@ -1,0 +1,74 @@
+.statistics {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.statistics__button {
+  width: 400px;
+  height: 60px;
+  background-color: $color-blue;
+  color: white;
+  margin: 0 auto;
+  border-radius: 0.25em;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 60px;
+  text-transform: uppercase;
+  transition: background-color 0.5s;
+  background-image: url("../img/repeat-button.svg");
+  background-repeat: no-repeat;
+  background-position: 51px;
+  transition: background-color background-image box-shadow 0.5s;
+}
+
+.statistics__button:hover,
+.statistics__button:active {
+  background-color: $button-color-play;
+  box-shadow: 0 0px 40px 0px rgba(0, 0, 0, 0.15);
+  -moz-box-shadow: 0 0px 40px 0px rgba(0, 0, 0, 0.15);
+  -webkit-box-shadow: 0 0px 40px 0px rgba(0, 0, 0, 0.15);
+  -o-box-shadow: 0 0px 40px 0px rgba(0, 0, 0, 0.15);
+  -ms-box-shadow: 0 0px 40px 0px rgba(0, 0, 0, 0.15); 
+}
+
+@media (max-width: 1400px) {
+  .statistics {
+    max-width: 940px;
+  }  
+}
+
+@media (max-width: 1020px) {
+  .statistics {
+    max-width: 680px;
+  }  
+}
+
+@media (max-width: 768px) {
+  .statistics {
+    max-width: 624px;
+  }  
+}
+
+@media (max-width: 700px) {
+  .statistics {
+    max-width: 600px;
+  }   
+
+  .statistics__button { 
+    width: 100%;
+  } 
+}
+
+@media (max-width: 600px) {
+  .statistics {
+    max-width: 300px;
+  }   
+
+  .statistics__button { 
+    width: 60px;
+    height: 60px;
+    font-size: 0;
+    background-position: center;
+    border-radius: 50%;
+  } 
+}

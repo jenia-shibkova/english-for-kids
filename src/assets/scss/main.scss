@@ -6,6 +6,7 @@
 @import 
   "components/switcher",
   "components/button",
+  "components/sorter",
   "components/popup";
 
 @import 
@@ -15,6 +16,7 @@
   "layout/card",
   "layout/rating",
   "layout/content",
+  "layout/statistics",
   "layout/table";
 
 *, ::after, ::before {
@@ -32,7 +34,7 @@ body {
 }
 
 .container {
-  max-width: 1000px;
+  max-width: 1330px;
   margin: 0 auto;
 }
 
@@ -44,13 +46,25 @@ body {
   opacity: .5;
 }
 
-@media (max-width: 1080px) {
+@media (max-width: 1439px) {
+  .container {
+    max-width: 1000px;
+  }  
+}
+
+@media (max-width: 1020px) {
   .container {
     max-width: 680px;
   }  
 }
 
 @media (max-width: 730px) {
+  .container {
+    max-width: 360px;
+  }
+}
+
+@media (max-width: 375px) {
   .container {
     max-width: 300px;
   }   

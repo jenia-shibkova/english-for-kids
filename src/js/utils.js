@@ -16,8 +16,27 @@ const shuffle = (array) => {
   return shuffleArr;
 };
 
+const getPercentage = (successes, errors) => {
+  const total = successes + errors;
+  return Math.round((100 * errors) / total);
+};
+
+const sortFunc = (array, param) => {
+  return array.sort((a, b) => {
+    if (a[param] > b[param]) {
+      return 1;
+    }
+    if (a[param] < b[param]) {
+      return -1;
+    }
+    return 0;
+  });
+};
+
 const UTILS = {
-  shuffle: shuffle
+  shuffle,
+  getPercentage,
+  sortFunc
 };
 
 export default UTILS;

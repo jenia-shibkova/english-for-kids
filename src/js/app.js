@@ -123,6 +123,8 @@ export default class App extends Component {
       this.changeCardsView();
       this.removeBlockedCardState();
       this.defaultCardState();
+      this.state.successes = 0;
+      this.state.errors = 0;
     });
   }
 

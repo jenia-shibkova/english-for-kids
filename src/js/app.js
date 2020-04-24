@@ -125,6 +125,7 @@ export default class App extends Component {
       this.defaultCardState();
       this.state.successes = 0;
       this.state.errors = 0;
+      this.state.currentCard = 0;
     });
   }
 

@@ -7,13 +7,22 @@ import Card from './card';
 export default class CardWrapper extends Component {
   constructor() {
     super();
-    this.template = `<main class="content container">
-        <div class="rating hidden">
+    this.template = `
+      <main class="content container">
+        <div id="rating" class="rating hidden">
         </div>
         <ul class="collections">            
         </ul>
         <button class="button content__button hidden">Start game</button>
-      </main>`;
+      </main>`.trim();
+
+    this.cardTitles = null;
+    this.rotateButton = null;
+    this.cards = null;
+    this.rating = null;
+    this.playButton = null;
+    this.element = null;
+
     this.generateCollectionItems = () => {
       const container = document.createDocumentFragment();
 
@@ -41,19 +50,94 @@ export default class CardWrapper extends Component {
 
   getCollections() {
     const container = this.generateCollectionItems();
-    const itemWrapper = this.createElement();
-    const collections = itemWrapper.querySelector('.collections');
+    this.element = this.createElement();
+    const collections = this.element.querySelector('.collections');
     collections.appendChild(container);
 
-    return itemWrapper;
+    return this.element;
   }
 
   changeCollection(index) {
     const data = DATA[index];
     const container = this.generateCards(data);
-    const itemWrapper = this.createElement();
-    const collections = itemWrapper.querySelector('.collections');
+    this.element = this.createElement();
+    const collections = this.element.querySelector('.collections');
     collections.append(container);
-    return itemWrapper;
+
+    return this.element;
+  }
+
+  initTrainModeElements() {
+    this.rating.classList.add('hidden');
+    this.playButton.classList.add('hidden');
+
+    this.showCardTitles();
+    this.hiddenCardsImageSize();
+    this.showRotateButtons();
+  }
+
+  showCardTitles() {
+    this.cardTitles.forEach((title) => {
+      title.classList.remove('hidden');
+    });
+  }
+
+  hiddenCardsImageSize() {
+    this.cards.forEach((card) => {
+      card.classList.remove('card__front--cover');
+    });
+  }
+
+  showRotateButtons() {
+    this.rotateButton.forEach((button) => {
+      button.classList.remove('hidden');
+    });
+  }
+
+  hiddenCardTitles() {
+    this.cardTitles.forEach((title) => {
+      title.classList.add('hidden');
+    });
+  }
+
+  addCardsImageSize() {
+    this.cards.forEach((card) => {
+      card.classList.add('card__front--cover');
+    });
+  }
+
+  hiddenRotateButtons() {
+    this.rotateButton.forEach((button) => {
+      button.classList.add('hidden');
+    });
+  }
+
+  showPlayModeElements() {
+    this.rating.classList.remove('hidden');
+    this.playButton.classList.remove('hidden');
+
+    this.hiddenCardTitles();
+    this.addCardsImageSize();
+    this.hiddenRotateButtons();
+  }
+
+  resetContentButtonView() {
+    this.playButton.classList.remove('content__button--repeat');
+  }
+
+  changeContentButtonView() {
+    this.playButton.classList.add('content__button--repeat');
+  }
+
+  clearRating() {
+    this.rating.innerHTML = '';
+  }
+
+  initCarsWrapperElements() {
+    this.cardTitles = document.querySelectorAll('.card__header');
+    this.rotateButton = document.querySelectorAll('.card__rotate');
+    this.cards = document.querySelectorAll('.card__front');
+    this.rating = document.getElementById('rating');
+    this.playButton = document.querySelector('.content__button');
   }
 }

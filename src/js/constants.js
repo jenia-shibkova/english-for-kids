@@ -3,7 +3,7 @@ const CONSTANTS = {
   statisticsPageName: 'Statistics',
   repeatWordsPageName: 'Repeat difficult words',
   paramForRepeat: 'errors',
-  maxCardsNumber: 8,
+  maxCardsValue: 8,
   collections: [
     'Actions (set A)', 'Actions (set B)', 'Actions (set C)', 'Adjectives', 'Animals (set A)', 'Animals (set B)', 'Clothes', 'Emotions'
   ],

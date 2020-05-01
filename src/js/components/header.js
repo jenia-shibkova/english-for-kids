@@ -3,7 +3,8 @@ import Component from './component';
 export default class Header extends Component {
   constructor() {
     super();
-    this.template = `<header class="page-header">     
+    this.template = `
+    <header class="page-header">     
       <div class="page-header__buttons-wrapper container">
         <button class="button page-header__button" type="button"></button> 
         <h1 class="page-header__title">Collections</h1>
@@ -53,19 +54,61 @@ export default class Header extends Component {
           </li>              
         </ul>
       </nav>    
-    </header>`;
-    this.closeNavigation = () => {
-      const navButton = document.querySelector('.page-header__button');
-      const navigation = document.querySelector('.page-header__navigation');
+    </header>`.trim();
 
-      navButton.classList.toggle('page-header__button--menu-open');
-      navigation.classList.toggle('page-header__navigation--open');
-    };
+    this.navigation = null;
+    this.navButton = null;
+    this.headerTitle = null;
+    this.switcher = null;
+    this.collectionsLink = null;
+    this.statisticsLink = null;
+  }
+
+  updateHeaderTitle(value) {
+    this.headerTitle.textContent = value;
+  }
+
+  addActiveStatisticsLink() {
+    document.querySelector('.navigation__item-link--active').classList.remove('navigation__item-link--active');
+    this.statisticsLink.classList.add('navigation__item-link--active');
+  }
+
+  addActiveCollectionsLink() {
+    document.querySelector('.navigation__item-link--active').classList.remove('navigation__item-link--active');
+    this.collectionsLink.classList.add('navigation__item-link--active');
+  }
+
+  static updateActiveLink(itemName) {
+    document.querySelector('.navigation__item-link--active').classList.remove('navigation__item-link--active');
+    const navElement = document.querySelector(`.navigation__item-link--${itemName}`);
+    navElement.classList.add('navigation__item-link--active');
+  }
+
+  closeNavigation() {
+    this.navButton.classList.toggle('page-header__button--menu-open');
+    this.navigation.classList.toggle('page-header__navigation--open');
+  }
+
+  setPlayMode() {
+    this.switcher.checked = true;
+  }
+
+  initHeaderElements() {
+    this.navigation = document.querySelector('.page-header__navigation');
+    this.navButton = document.querySelector('.page-header__button');
+    this.headerTitle = document.querySelector('.page-header__title');
+    this.switcher = document.getElementById('switchState');
+    this.collectionsLink = document.getElementById('Collections');
+    this.statisticsLink = document.getElementById('Statistics');
+  }
+
+  subscribeOnSwitcherChange(func) {
+    this.switcher.addEventListener('change', () => {
+      func(this.switcher.checked);
+    });
   }
 
   start() {
-    const navButton = document.querySelector('.page-header__button');
-
-    navButton.addEventListener('click', this.closeNavigation);
+    this.navButton.addEventListener('click', this.closeNavigation.bind(this));
   }
 }

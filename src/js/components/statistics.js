@@ -6,7 +6,8 @@ import UTILS from '../utils';
 export default class Statistics extends Component {
   constructor() {
     super();
-    this.template = `<main class="content statistics">
+    this.template = `
+    <main class="content statistics">
       <div class="statistics__table table-wrapper">
         <table class="table">
           <thead class="table__head">
@@ -123,7 +124,7 @@ export default class Statistics extends Component {
                 </span>
               </th>
               <th class="table__reset">
-                <button class="table__reset-button button">Reset</button>
+                <button id="reset" class="table__reset-button button">Reset</button>
               </th>
             </tr>
           </thead>
@@ -132,9 +133,14 @@ export default class Statistics extends Component {
       </div>
       
       <button class="button statistics__button hidden">Repeat difficult words</button>
-    </main>`;
+    </main>`.trim();
+
     this.emptyRow = new EmptyRow();
     this.tableData = null;
+    this.tableWrapper = null;
+    this.tableHead = null;
+    this.resetButton = null;
+    this.repeatButton = null;
   }
 
   getLocalStorageData() {
@@ -144,13 +150,7 @@ export default class Statistics extends Component {
     const fullData = savedData.map((key) => localStorage.getItem(key));
     const parsedData = fullData.map((item) => JSON.parse(item));
 
-    const resultData = [];
-
-    parsedData.forEach((elem) => {
-      const percentErrors = UTILS.getPercentage(elem.successes, elem.errors) || 0;
-
-      resultData.push(Object.assign(elem, { percentErrors }));
-    });
+    const resultData = UTILS.getFullStatisticsData(parsedData);
 
     this.tableData = resultData.slice();
     return resultData;
@@ -169,18 +169,23 @@ export default class Statistics extends Component {
     return fragment;
   }
 
+  renderEmptyRow() {
+    const emptyRow = this.getEmptyRow();
+    this.tableWrapper.appendChild(emptyRow);
+  }
+
   getEmptyRow() {
     return this.emptyRow.createElement();
   }
 
-  sortByAscend(param) { // .sort__arrow--up
+  sortByAscend(param) { // press on .sort__arrow--up
     const tableData = this.tableData.slice();
     if (tableData.length === 1) return tableData;
 
     return UTILS.sortFunc(tableData, param);
   }
 
-  sortByDescend(param) { // .sort__arrow--down
+  sortByDescend(param) { // press on .sort__arrow--down
     const tableData = this.tableData.slice();
     if (tableData.length === 1) return tableData;
 
@@ -190,7 +195,10 @@ export default class Statistics extends Component {
 
   sorterClickHandler() {
     document.querySelector('.table__head').addEventListener('click', ({ target, path }) => {
-      if (!this.tableData || this.tableData.length === 0) return;
+      if (!target.classList.contains('sorter__arrow')
+          || !this.tableData || this.tableData.length === 0) {
+        return;
+      }
 
       const param = path[1].id;
       let data;
@@ -208,5 +216,47 @@ export default class Statistics extends Component {
       tableWrapper.innerHTML = '';
       tableWrapper.append(sortedData);
     });
+  }
+
+  resetLocalStorage() {
+    localStorage.clear();
+
+    this.tableWrapper.innerHTML = '';
+    const emptyRow = this.getEmptyRow();
+
+    this.tableWrapper.appendChild(emptyRow);
+    this.tableData = null;
+    this.hiddenRepeatButton();
+  }
+
+  hiddenRepeatButton() {
+    this.repeatButton.classList.add('hidden');
+  }
+
+  showRepeatButton() {
+    this.repeatButton.classList.remove('hidden');
+  }
+
+  onResetButtonClick() {
+    this.resetButton.addEventListener('click', this.resetLocalStorage.bind(this));
+  }
+
+  subscribeOnRepeatButtonClick(func) {
+    this.repeatButton.addEventListener('click', () => {
+      func();
+    });
+  }
+
+  initStatisticsElements() {
+    this.tableWrapper = document.querySelector('.table__body');
+    this.tableHead = document.querySelector('.table__head');
+    this.resetButton = document.getElementById('reset');
+    this.repeatButton = document.querySelector('.statistics__button');
+  }
+
+  initStatistics() {
+    this.initStatisticsElements();
+    this.sorterClickHandler();
+    this.onResetButtonClick();
   }
 }

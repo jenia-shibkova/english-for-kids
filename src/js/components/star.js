@@ -6,15 +6,15 @@ export default class Star {
 
   createCorrectStar() {
     const template = this.correct;
-    const newElement = document.createElement('template');
+    const newElement = document.createElement('div');
     newElement.innerHTML = template;
-    return newElement.content.children[0];
+    return newElement.firstChild;
   }
 
   createErrorStar() {
     const template = this.error;
-    const newElement = document.createElement('template');
+    const newElement = document.createElement('div');
     newElement.innerHTML = template;
-    return newElement.content.children[0];
+    return newElement.firstChild;
   }
 }

@@ -1,6 +1,7 @@
 import Component from './components/component';
 import Header from './components/header';
 import CardWrapper from './components/card-wrapper';
+import Card from './components/card';
 import Statistics from './components/statistics';
 import Star from './components/star';
 import Failure from './components/failure';
@@ -19,12 +20,15 @@ export default class App extends Component {
       play: false,
       gameActive: false,
       randomArr: null,
-      repeatData: null,
       errors: 0,
       successes: 0,
-      cardNumber: CONSTANTS.maxCardsNumber
+      maxCardsValue: CONSTANTS.maxCardsValue
     };
     this.template = '<div class="app-wrapper"></div>';
+
+    this.appWrapper = null;
+    this.mainContent = null;
+
     this.header = new Header();
     this.cardWrapper = new CardWrapper();
     this.statistics = new Statistics();
@@ -34,365 +38,235 @@ export default class App extends Component {
     this.errorSound = new Audio('./assets/audio/error.mp3');
     this.successSound = new Audio('./assets/audio/success.mp3');
     this.failureSound = new Audio('./assets/audio/failure.mp3');
-    this.removeBlockedCardState = () => {
-      const blockedCards = document.querySelectorAll('.blocked');
-
-      if (blockedCards) {
-        blockedCards.forEach((card) => {
-          card.classList.remove('blocked');
-        });
-      }
-    };
-    this.defaultCardState = () => {
-      const cards = document.querySelectorAll('.translate');
-
-      if (cards) {
-        cards.forEach((card) => {
-          card.classList.remove('translate');
-        });
-      }
-    };
-    this.updateHeaderTitle = (value) => {
-      document.querySelector('.page-header__title').innerHTML = value;
-    };
-    this.onButtonRotateHandler = (path) => {
-      path[1].classList.add('translate');
-      path[1].addEventListener('mouseleave', () => {
-        path[1].classList.remove('translate');
-      });
-    };
   }
 
   resetState() {
-    this.state.page = CONSTANTS.startPageName;
     this.state.gameActive = false;
     this.state.randomArr = null;
     this.state.currentSound = null;
     this.state.currentCard = 0;
     this.state.successes = 0;
     this.state.errors = 0;
-    this.repeatData = null;
-  }
-
-  initGame() {
-    const collectionIndex = CONSTANTS.collections.indexOf(this.state.page);
-    const collectionData = DATA[collectionIndex].slice();
-    this.state.randomArr = UTILS.shuffle(collectionData);
-    this.state.gameActive = true;
-    this.playGame();
-  }
-
-  initRepeatWordGame() {
-    this.state.randomArr = this.state.repeatData;
-    this.state.gameActive = true;
-    this.playGame();
   }
 
   playGame() {
-    this.state.gameActive = true;
+    if (this.state.currentCard === this.state.randomArr.length) {
+      if (this.state.errors === 0) {
+        this.getWinResult();
+      } else {
+        this.getFailureResult();
+      }
+
+      this.resetState();
+
+      setTimeout(() => {
+        document.querySelector('.popup').remove();
+        this.getStartPage();
+      }, 3500);
+
+      return;
+    }
+
     this.state.currentSound = new Audio(`./assets/${this.state.randomArr[this.state.currentCard].audioSrc}`);
     this.state.currentSound.play();
   }
 
-  repeatSound() {
-    this.state.currentSound.play();
+  initPlayMode() {
+    this.state.gameActive = true;
+    const collectionIndex = CONSTANTS.collections.indexOf(this.state.page);
+    const collectionData = DATA[collectionIndex].slice();
+    this.state.randomArr = UTILS.shuffle(collectionData);
+    this.playGame();
   }
 
-  changeSwitchStateHandler() {
-    const switcher = document.getElementById('switchState');
-
-    switcher.addEventListener('change', () => {
-      if (switcher.checked) {
-        this.state.play = true;
-
-        if (this.state.page === CONSTANTS.statisticsPageName) return;
-      } else {
-        this.state.play = false;
-        if (this.state.page === CONSTANTS.statisticsPageName) return;
-
-        const playButton = document.querySelector('.content__button');
-
-        if (playButton) {
-          if (playButton.classList.contains('content__button--repeat')) {
-            playButton.classList.remove('content__button--repeat');
-          }
-          document.querySelector('.rating').innerHTML = '';
-        }
-      }
-
-      this.changeCardsView();
-      this.removeBlockedCardState();
-      this.defaultCardState();
-      this.state.successes = 0;
-      this.state.errors = 0;
-      this.state.currentCard = 0;
-    });
+  initRepeatMode() {
+    this.state.gameActive = true;
+    this.state.randomArr = UTILS.shuffle(this.state.randomArr);
+    this.playGame();
   }
 
-  changeCardsView() {
-    if (this.state.page === CONSTANTS.startPageName) {
-      return;
-    }
+  getSuccessAnswer(target) {
+    this.correctSound.play();
+    this.cardWrapper.rating.appendChild(this.star.createCorrectStar());
+    target.classList.add('blocked');
 
-    const cardTitles = document.querySelectorAll('.card__header');
-    const rotateButton = document.querySelectorAll('.card__rotate');
-    const cards = document.querySelectorAll('.card__front');
-    const rating = document.querySelector('.rating');
-    const playButton = document.querySelector('.content__button');
-
-    if (this.state.play) {
-      rating.classList.remove('hidden');
-      playButton.classList.remove('hidden');
-
-      cardTitles.forEach((title) => {
-        title.classList.add('hidden');
-      });
-
-      cards.forEach((card) => {
-        card.classList.add('card__front--cover');
-      });
-
-      if (rotateButton) {
-        rotateButton.forEach((button) => {
-          button.classList.add('hidden');
-        });
-      }
-    } else {
-      rating.classList.add('hidden');
-      playButton.classList.add('hidden');
-
-      cardTitles.forEach((title) => {
-        title.classList.remove('hidden');
-      });
-
-      cards.forEach((card) => {
-        card.classList.remove('card__front--cover');
-      });
-
-      rotateButton.forEach((button) => {
-        button.classList.remove('hidden');
-      });
-
-      this.state.gameActive = false;
-    }
+    this.state.successes += 1;
+    this.state.currentCard += 1;
   }
 
-  onCardClickHandler(target) {
-    if (!this.state.play) {
-      if (target.classList.contains('translate')) return;
+  getWrongAnswer() {
+    this.errorSound.play();
+    this.cardWrapper.rating.appendChild(this.star.createErrorStar());
 
-      const wordArr = [...document.querySelectorAll('.card__header')];
-      const currentWord = target.querySelector('.card__header').innerHTML;
-      const translation = target.querySelectorAll('.card__header')[1].innerHTML;
+    this.state.errors += 1;
+  }
 
-      const words = [];
-      wordArr.forEach((el, index) => {
-        if (index % 2 === 0) words.push(el.innerHTML);
-      });
+  getWinResult() {
+    document.querySelector('main').innerHTML = '';
 
-      const wordIndex = words.indexOf(currentWord);
-      const collectionIndex = CONSTANTS.collections.indexOf(this.state.page);
-      const collectionData = DATA[collectionIndex];
-      const wordSound = collectionData[wordIndex].audioSrc;
+    this.successResult.renderElement(document.body);
+    this.successSound.play();
+  }
 
-      const currentSound = new Audio(`./assets/${wordSound}`);
+  getFailureResult() {
+    const resultPopupTemplate = new Failure(this.state.errors);
+    document.querySelector('main').innerHTML = '';
 
-      setTimeout(() => currentSound.play(), 0);
+    resultPopupTemplate.renderElement(document.body);
+    this.failureSound.play();
+  }
 
-      const param = 'trainModeClicked';
-      App.localStorageInit(currentWord, translation, this.state.page, param);
-    }
-
+  initGame(target) {
     if (this.state.gameActive) {
       const currentCardWord = target.querySelector('.card__header').innerHTML;
-      const answerWord = this.state.randomArr[this.state.currentCard].word;
-      const translation = this.state.randomArr[this.state.currentCard].translation;
-      const starWrapper = document.querySelector('.rating');
+      const { word } = this.state.randomArr[this.state.currentCard];
+      const { translation } = this.state.randomArr[this.state.currentCard];
 
       if (target.classList.contains('blocked')) return;
 
-      if (currentCardWord === answerWord) {
-        this.correctSound.play();
-        starWrapper.appendChild(this.star.createCorrectStar());
-        target.classList.add('blocked');
-
-
-        this.state.successes += 1;
-        this.state.currentCard += 1;
+      if (currentCardWord === word) {
+        this.getSuccessAnswer(target);
 
         const param = 'successes';
-        App.localStorageInit(currentCardWord, translation, this.state.page, param);
+        UTILS.localStorageInit(currentCardWord, translation, this.state.page, param);
 
-        if (this.state.currentCard === this.state.cardNumber) {
-          if (this.state.errors === 0) {
-            setTimeout(() => {
-              const resultPopup = this.successResult.createElement();
-              document.querySelector('main').innerHTML = '';
-              document.body.appendChild(resultPopup);
-              this.successSound.play();
-            }, 300);
-          } else {
-            setTimeout(() => {
-              const resultPopupTemplate = new Failure(this.state.errors);
-              const resultPopup = resultPopupTemplate.createElement();
-              document.querySelector('main').innerHTML = '';
-              document.body.appendChild(resultPopup);
-              this.failureSound.play();
-            }, 300);
-          }
-
-          setTimeout(() => {
-            document.querySelector('.popup').remove();
-            this.getStartPage();
-            this.resetState();
-          }, 3500);
-
-          return;
-        }
-
-        setTimeout(() => this.playGame(), 700);
+        setTimeout(() => this.playGame(), 200);
       } else {
-        this.errorSound.play();
-        starWrapper.appendChild(this.star.createErrorStar());
+        this.getWrongAnswer();
 
-        this.state.errors += 1;
         const param = 'errors';
-        App.localStorageInit(answerWord, translation, this.state.page, param);
+        UTILS.localStorageInit(word, translation, this.state.page, param);
       }
     }
   }
 
-  static localStorageInit(word, translation, collection, param) {
-    const savedWords = Object.keys(localStorage);
+  initTrainMode(target) {
+    const wordsArr = [...document.querySelectorAll('.card__header')];
+    const currentWord = target.querySelector('.card__header').innerHTML;
+    const translation = target.querySelectorAll('.card__header')[1].innerHTML;
 
-    if (savedWords.includes(word)) {
-      const savedWordData = JSON.parse(localStorage.getItem(word));
+    const words = UTILS.getInnerHTMLFromArray(wordsArr);
 
-      savedWordData[param] += 1;
-      localStorage.removeItem(word);
-      localStorage.setItem(word, JSON.stringify(savedWordData));
-    } else {
-      const newWordData = {
-        word,
-        collection,
-        translation,
-        trainModeClicked: 0,
-        successes: 0,
-        errors: 0
-      };
+    const wordIndex = words.indexOf(currentWord);
+    const collectionIndex = CONSTANTS.collections.indexOf(this.state.page);
+    const collectionData = DATA[collectionIndex];
+    const wordSound = collectionData[wordIndex].audioSrc;
 
-      newWordData[param] += 1;
-      localStorage.setItem(word, JSON.stringify(newWordData));
-    }
+    const currentSound = new Audio(`./assets/${wordSound}`);
+
+    setTimeout(() => currentSound.play(), 0);
+
+    const param = 'trainModeClicked';
+    UTILS.localStorageInit(currentWord, translation, this.state.page, param);
   }
 
-  onNavigationClickHandler(target, activeElem) {
-    const collection = target.innerHTML;
-    this.state.page = collection;
-    const collectionIndex = CONSTANTS.collections.indexOf(collection);
+  setTrainMode() {
+    this.state.play = false;
 
-    this.changePage(collectionIndex);
-    this.updateHeaderTitle(collection);
-    this.changeCardsView();
-
-    target.classList.add('navigation__item-link--active');
-    activeElem.classList.remove('navigation__item-link--active');
-  }
-
-  onCollectionItemClickHandler(target, activeElem) {
-    const collection = target.querySelector('h2').innerHTML;
-    this.state.page = collection;
-    const collectionIndex = CONSTANTS.collections.indexOf(collection);
-    const itemName = CONSTANTS.itemName[collectionIndex];
-    const navElement = document.querySelector(`.navigation__item-link--${itemName}`);
-
-    this.changePage(collectionIndex);
-    this.updateHeaderTitle(collection);
-    this.changeCardsView();
-
-    navElement.classList.add('navigation__item-link--active');
-    activeElem.classList.remove('navigation__item-link--active');
-  }
-
-  onClickHandler({ target, path }) {
-    const activeLink = document.querySelector('.navigation__item-link--active');
-    const headerNav = document.querySelector('.page-header__navigation');
-
-    if (target.id === CONSTANTS.startPageName) {
-      if (this.state.page === CONSTANTS.startPageName) {
-        return;
-      }
-
-      this.getStartPage();
-
-      target.classList.toggle('navigation__item-link--active');
-      activeLink.classList.toggle('navigation__item-link--active');
-    }
-
-    if (target.id === CONSTANTS.statisticsPageName) {
-      this.getStatisticsPage();
-
-      activeLink.classList.toggle('navigation__item-link--active');
-      target.classList.toggle('navigation__item-link--active');
-      this.header.closeNavigation();
+    if (this.state.page === CONSTANTS.startPageName
+      || this.state.page === CONSTANTS.statisticsPageName) {
       return;
     }
 
-    if (target.id !== CONSTANTS.startPageName && target.classList.contains('navigation__item-link')) {
-      this.onNavigationClickHandler(target, activeLink);
+    this.cardWrapper.initTrainModeElements();
+    this.cardWrapper.resetContentButtonView();
+  }
+
+  setPlayMode() {
+    this.state.play = true;
+
+    if (this.state.page === CONSTANTS.startPageName
+      || this.state.page === CONSTANTS.statisticsPageName) {
+      return;
     }
 
-    if (target.classList.contains('collections__item-link')) {
-      this.onCollectionItemClickHandler(target, activeLink);
+    this.cardWrapper.showPlayModeElements();
+  }
+
+  switchMode(mode) {
+    if (mode) {
+      this.setPlayMode();
+    } else {
+      this.setTrainMode();
     }
 
-    if (target.classList.contains('card__wrapper')) {
-      this.onCardClickHandler(target);
+    this.resetState();
+
+    if (this.state.page !== CONSTANTS.startPageName
+      || this.state.page !== CONSTANTS.statisticsPageName) {
+      return;
     }
 
-    if (target.classList.contains('card__rotate')) {
-      this.onButtonRotateHandler(path);
-    }
+    Card.removeBlockedCardState();
+    this.cardWrapper.initCarsWrapperElements();
+    this.cardWrapper.clearRating();
+  }
 
-    if (target.className === 'button content__button') {
-      if (this.state.page === CONSTANTS.repeatWordsPageName) {
-        this.initRepeatWordGame();
-      } else {
-        this.initGame();
-      }
-      target.classList.add('content__button--repeat');
-    }
+  renderStartPage() {
+    document.querySelector('main').remove();
 
-    if (target.classList.contains('statistics__button')) {
-      this.getRepeatWordsPage();
-    }
+    const collections = this.cardWrapper.getCollections();
+    this.appWrapper.append(collections);
+  }
 
-    if (target.className === 'button content__button content__button--repeat') {
-      this.state.currentSound.play();
-    }
+  changeCollection(target) {
+    const collection = target.querySelector('h2').innerHTML;
+    this.header.updateHeaderTitle(collection);
+    this.state.page = collection;
 
-    if (target.classList.contains('table__reset-button')) {
-      this.resetLocalStorage();
-    }
+    const collectionIndex = CONSTANTS.collections.indexOf(collection);
+    const itemName = CONSTANTS.itemName[collectionIndex];
 
-    if (!target.classList.contains('page-header__navigation')
-    && !target.classList.contains('page-header__button')) {
-      if (!headerNav.classList.contains('page-header__navigation--open')) return;
-      this.header.closeNavigation();
+    Header.updateActiveLink(itemName);
+    this.renderCollectionPage(collectionIndex);
+
+    this.cardWrapper.initCarsWrapperElements();
+
+    if (this.state.play) {
+      this.setPlayMode();
+    } else {
+      this.setTrainMode();
     }
   }
 
-  changePage(index) {
-    this.state.gameActive = false;
+  renderCollectionPage(index) {
     document.querySelector('main').remove();
 
     const pageContent = this.cardWrapper.changeCollection(index);
-    document.querySelector('.app-wrapper').append(pageContent);
+    this.appWrapper.append(pageContent);
+  }
+
+  onNavigationLinClick(target) {
+    const collection = target.innerHTML;
+    this.state.page = collection;
+
+    const collectionIndex = CONSTANTS.collections.indexOf(collection);
+    const itemName = CONSTANTS.itemName[collectionIndex];
+
+    this.header.updateHeaderTitle(collection);
+    Header.updateActiveLink(itemName);
+    this.renderCollectionPage(collectionIndex);
+
+    this.cardWrapper.initCarsWrapperElements();
+    if (this.state.play) {
+      this.setPlayMode();
+    } else {
+      this.setTrainMode();
+    }
+  }
+
+  getStartPage() {
+    this.renderStartPage();
+    this.header.updateHeaderTitle(CONSTANTS.startPageName);
+    this.header.addActiveCollectionsLink();
   }
 
   getStatisticsPage() {
     document.querySelector('main').remove();
+
     this.state.page = CONSTANTS.statisticsPageName;
+    this.header.addActiveStatisticsLink();
+    this.header.updateHeaderTitle(CONSTANTS.statisticsPageName);
 
     const statisticsWrapper = this.statistics.createElement();
     const parsedData = this.statistics.getLocalStorageData();
@@ -405,97 +279,120 @@ export default class App extends Component {
       statisticsWrapper.querySelector('.table__body').append(tableRows);
     }
 
-    this.updateHeaderTitle(CONSTANTS.statisticsPageName);
-    document.querySelector('.app-wrapper').append(statisticsWrapper);
 
-    this.statistics.sorterClickHandler();
+    this.appWrapper.append(statisticsWrapper);
+
+    this.statistics.initStatistics();
+    this.statistics.subscribeOnRepeatButtonClick(this.getRepeatWordsPage.bind(this));
 
     if (parsedData.length > 0) {
-      document.querySelector('.statistics__button').classList.remove('hidden');
+      this.statistics.showRepeatButton();
     }
   }
 
-  resetLocalStorage() {
-    localStorage.clear();
+  onClickHandler({ target, path }) {
+    if (target.id === CONSTANTS.startPageName) {
+      if (this.state.page === CONSTANTS.startPageName) {
+        return;
+      }
 
-    if (this.state.page === CONSTANTS.statisticsPageName) {
-      const tableBody = document.querySelector('.table__body');
-      tableBody.innerHTML = '';
-
-      const emptyRow = this.statistics.getEmptyRow();
-      tableBody.appendChild(emptyRow);
-      this.statistics.tableData = null;
+      this.getStartPage();
     }
 
-    document.querySelector('.statistics__button').classList.add('hidden');
+    if (target.classList.contains('collections__item-link')) {
+      this.changeCollection(target);
+    }
+
+    if (target.id !== CONSTANTS.startPageName && target.classList.contains('navigation__item-link')
+      && target.id !== CONSTANTS.statisticsPageName) {
+      this.onNavigationLinClick(target);
+    }
+
+    if (target.id === CONSTANTS.statisticsPageName) {
+      this.getStatisticsPage();
+      this.header.closeNavigation();
+      return;
+    }
+
+    if (target.classList.contains('card__wrapper')) {
+      if (this.state.play) {
+        this.initGame(target);
+      } else {
+        this.initTrainMode(target);
+      }
+    }
+
+    if (target.classList.contains('card__rotate')) {
+      Card.onButtonRotateHandler(path);
+    }
+
+    if (target.classList.contains('content__button') && !target.classList.contains('content__button--repeat')) {
+      if (this.state.page !== CONSTANTS.repeatWordsPageName) {
+        this.initPlayMode();
+      } else {
+        this.initRepeatMode();
+      }
+      this.cardWrapper.changeContentButtonView();
+    }
+
+    if (target.classList.contains('content__button--repeat')) {
+      this.state.currentSound.play();
+    }
+
+    if (!target.classList.contains('page-header__navigation')
+      && !target.classList.contains('page-header__button')) {
+      if (!this.header.navigation.classList.contains('page-header__navigation--open')) return;
+
+      this.header.closeNavigation();
+    }
+  }
+
+  initRepeatWordsMode() {
+    this.header.setPlayMode();
+    this.state.play = true;
+    this.state.page = CONSTANTS.repeatWordsPageName;
+    this.header.updateHeaderTitle(CONSTANTS.repeatWordsPageName);
+
+    this.cardWrapper.initCarsWrapperElements();
+    this.setPlayMode();
   }
 
   getRepeatWordsPage() {
-    if (this.statistics.tableData.length === 0) return;
-
     document.querySelector('main').remove();
 
-    const repeatParam = CONSTANTS.paramForRepeat;
-    const sortedData = this.statistics.sortByDescend(repeatParam);
-    const cardsData = App.getRepeatWordsData(sortedData);
+    const sortedData = this.statistics.sortByDescend(CONSTANTS.paramForRepeat);
+    const cardsData = UTILS.getRepeatWordsData(sortedData);
 
-    this.state.repeatData = cardsData;
-    this.state.cardNumber = cardsData.length;
+    this.state.randomArr = cardsData;
+
     const cardWrapper = this.cardWrapper.createElement();
     const pageContent = this.cardWrapper.generateCards(cardsData);
 
     cardWrapper.querySelector('.collections').append(pageContent);
-    document.querySelector('.app-wrapper').append(cardWrapper);
+    this.appWrapper.append(cardWrapper);
 
-    document.getElementById('switchState').checked = true;
-    this.state.play = true;
-    this.state.page = CONSTANTS.repeatWordsPageName;
-    this.updateHeaderTitle(CONSTANTS.repeatWordsPageName);
-    this.changeCardsView();
+    this.initRepeatWordsMode();
   }
 
-  static getRepeatWordsData(array) {
-    const data = [];
-    const repeatArr = array.slice(0, CONSTANTS.maxCardsNumber);
-
-    repeatArr.forEach((elem) => {
-      const { collection, word } = elem;
-      const collectionIndex = CONSTANTS.collections.indexOf(collection);
-      const collectionData = DATA[collectionIndex].slice();
-
-      collectionData.forEach((item, index) => {
-        if (item.word === word) {
-          data.push(collectionData[index]);
-        }
-      });
-    });
-
-    return data;
-  }
-
-  getStartPage() {
-    document.querySelector('main').remove();
-    this.state.gameActive = false;
-    this.state.page = CONSTANTS.startPageName;
-    const collections = this.cardWrapper.getCollections();
-    this.updateHeaderTitle(CONSTANTS.startPageName);
-    document.querySelector('.app-wrapper').append(collections);
+  initAppElements() {
+    this.appWrapper = document.querySelector('.app-wrapper');
   }
 
   start() {
     const appWrapper = this.createElement();
-    const header = this.header.createElement();
     const container = document.createDocumentFragment();
     const collections = this.cardWrapper.getCollections();
 
-    container.appendChild(header);
+    this.header.renderElement(container);
     container.appendChild(collections);
 
     document.body.prepend(appWrapper);
     document.querySelector('.app-wrapper').appendChild(container);
+    this.initAppElements();
 
+    this.header.initHeaderElements();
     this.header.start();
-    this.changeSwitchStateHandler();
+    this.header.subscribeOnSwitcherChange(this.switchMode.bind(this));
 
     document.addEventListener('click', this.onClickHandler.bind(this));
   }
